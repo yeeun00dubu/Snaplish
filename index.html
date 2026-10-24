@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Snaplish</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #eef6ee;
+      --screen: #f7faf6;
+      --ink: #0b140d;
+      --green: #6ce182;
+      --muted: #667068;
+      --line: #e3ebe3;
+      --card: #ffffff;
+      --soft: #f3f6f3;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Pretendard, "Malgun Gothic", sans-serif;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+    button, input { font-family: inherit; }
+
+    .stage {
+      min-height: 100%;
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) 390px;
+      justify-content: center;
+      align-items: center;
+      gap: 84px;
+      padding: 48px 40px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      color: #5e6a62;
+    }
+    .logo {
+      margin: 0;
+      font-family: "Instrument Serif", Georgia, serif;
+      font-weight: 400;
+      font-size: 84px;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+    }
+    .logo span {
+      background: var(--green);
+      padding: 0 0.08em 0.02em;
+    }
+    .lead {
+      max-width: 360px;
+      margin: 22px 0 28px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #1c2820;
+    }
+    .points { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+    .points button {
+      all: unset;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .points button:hover .point-label,
+    .points button.on .point-label { color: #146b34; }
+    .dot {
+      width: 22px;
+      height: 22px;
+      border: 1.5px solid var(--ink);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+    .points button.on .dot { border-color: #146b34; border-width: 2px; }
+    .watch { margin: 22px 0 0; font-size: 13px; font-weight: 700; color: #1c6b34; }
+
+    .phone {
+      width: 390px;
+      height: 820px;
+      background: var(--ink);
+      border-radius: 46px;
+      padding: 10px;
+      box-shadow: 0 24px 50px rgba(11, 20, 13, 0.14);
+    }
+    .screen {
+      position: relative;
+      height: 100%;
+      background: var(--screen);
+      border-radius: 36px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .status {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 22px 0;
+      font-size: 14px;
+      font-weight: 650;
+      flex: 0 0 auto;
+    }
+    .status-right { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 650; }
+    .scroll {
+      flex: 1;
+      overflow: auto;
+      padding: 6px 16px 108px;
+    }
+    .scroll::-webkit-scrollbar { width: 4px; }
+    .scroll::-webkit-scrollbar-thumb { background: #d5ddd6; border-radius: 99px; }
+
+    .stack { display: grid; gap: 12px; }
+    .alert {
+      background: var(--ink);
+      color: #fff;
+      border-radius: 22px;
+      padding: 14px 14px 12px;
+    }
+    .alert-top, .row-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .kicker {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #c9d4cb;
+    }
+    .icon-btn {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .phrase {
+      margin: 12px 0 4px;
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+    }
+    .ko {
+      margin: 0 0 12px;
+      color: var(--green);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .note { color: #b7c4b8; font-weight: 400; }
+    .btn-row { display: flex; gap: 8px; }
+    .pill, .ghost, .choice, .line, .chip, .goal-chip {
+      border: 0;
+      cursor: pointer;
+    }
+    .pill, .ghost {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .pill { background: var(--green); color: var(--ink); }
+    .pill:disabled { background: #e7f6ea; color: #3d7a4e; cursor: default; }
+    .alert .pill:disabled {
+      background: transparent;
+      color: #d9ffe3;
+      border: 1px solid rgba(108, 225, 130, 0.9);
+    }
+    .ghost {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.28);
+    }
+    .alert .choices { display: grid; gap: 6px; margin-top: 8px; }
+    .alert .choices .ghost { height: auto; padding: 6px 10px; text-align: left; white-space: normal; }
+    .insight {
+      background: var(--green);
+      border-radius: 22px;
+      padding: 16px 16px 15px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--ink);
+      width: 100%;
+    }
+    .insight .kicker { color: #145c30; font-weight: 700; }
+    .insight p { margin: 8px 0 0; font-size: 14.5px; line-height: 1.55; font-weight: 550; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat, .card, .shot, .choice, .step {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    .stat { text-align: center; padding: 16px 6px 14px; }
+    .stat b { display: block; font-size: 26px; letter-spacing: -0.04em; font-weight: 680; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .section-title {
+      margin: 6px 2px 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .card {
+      width: 100%;
+      text-align: left;
+      padding: 14px 14px 13px;
+      color: inherit;
+    }
+    .card:hover, .choice:hover, .line:hover { border-color: #b7e7c2; }
+    .source { color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .tag {
+      background: var(--soft);
+      color: #3e4b42;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 650;
+    }
+    .en { margin: 10px 0 2px; font-size: 15.5px; font-weight: 650; letter-spacing: -0.02em; }
+    .card .ko, .detail .ko { color: #243028; margin: 0; }
+
+    .tabbar {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 78px;
+      background: #fff;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr 1fr 72px 1fr 1fr;
+      align-items: end;
+      padding: 0 6px 10px;
+      z-index: 3;
+    }
+    .tab {
+      border: 0;
+      background: transparent;
+      color: #8b948c;
+      display: grid;
+      justify-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 650;
+      cursor: pointer;
+      padding-bottom: 2px;
+    }
+    .tab.on { color: var(--ink); }
+    .cam-wrap { position: relative; }
+    .cam {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 5px solid #fff;
+      background: var(--green);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      z-index: 4;
+    }
+    .cam:hover { filter: brightness(0.97); }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: 96px;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100% - 36px);
+      background: var(--ink);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      line-height: 1.4;
+      z-index: 6;
+      text-align: center;
+    }
+
+    .page-title { margin: 8px 2px 0; font-size: 26px; letter-spacing: -0.04em; }
+    .sub { margin: 4px 2px 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .search {
+      margin-top: 14px;
+      width: 100%;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 0 14px;
+      font-size: 14px;
+      outline: none;
+    }
+    .search:focus { border-color: #8ed9a0; }
+    .chips { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }
+    .chip, .goal-chip {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: #3d4941;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .chip.on, .goal-chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .empty { color: var(--muted); font-size: 14px; padding: 12px 2px; }
+    .speak {
+      margin-top: 10px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .shot { overflow: hidden; }
+    .shot-video {
+      height: 148px;
+      background: #14211a;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 12px;
+    }
+    .shot-video span {
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+    .shot-meta { padding: 10px 12px 12px; font-size: 12px; color: var(--muted); }
+    .line {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: inherit;
+    }
+    .line small { color: var(--muted); font-size: 11px; font-weight: 700; }
+    .line.ui { opacity: 0.55; }
+    .line.picked { border-color: var(--green); background: #f3fff6; }
+
+    .bar {
+      height: 8px;
+      background: rgba(11,20,13,0.08);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 12px 0 6px;
+    }
+    .bar i { display: block; height: 100%; background: var(--ink); border-radius: inherit; }
+    .insight .bar { background: rgba(11,20,13,0.12); }
+    .q-top { display: flex; justify-content: space-between; align-items: end; }
+    .q-top h2, .goal-hero h2, .detail h2 { margin: 0; letter-spacing: -0.04em; }
+    .prompt { font-size: 18px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.45; margin: 16px 0 10px; }
+    .choice {
+      width: 100%;
+      text-align: left;
+      padding: 14px;
+      font-size: 14.5px;
+      color: inherit;
+    }
+    .choice.good { background: var(--green); border-color: var(--green); }
+    .choice.bad { background: #f4f1ea; }
+    .explain { margin: 4px 2px 0; font-size: 13px; line-height: 1.5; color: #245c36; }
+    .wide {
+      width: 100%;
+      height: 46px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .score {
+      background: var(--green);
+      border-radius: 22px;
+      padding: 22px 18px;
+    }
+    .score b { font-size: 42px; letter-spacing: -0.04em; }
+
+    .goal-hero {
+      background: var(--green);
+      border-radius: 22px;
+      padding: 18px 16px 16px;
+    }
+    .goal-hero .kicker { color: #145c30; font-weight: 700; }
+    .goal-hero h2 { font-size: 36px; margin-top: 4px; }
+    .goal-hero p { margin: 6px 0 0; font-size: 14px; line-height: 1.5; }
+    .fine { margin: 0; font-size: 12px; font-weight: 700; }
+    .step { padding: 12px 14px; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: center; }
+    .num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--soft); display: grid; place-items: center;
+      font-size: 12px; font-weight: 800;
+    }
+    .step b { display: block; font-size: 14px; }
+    .step span { color: var(--muted); font-size: 12px; }
+    .back {
+      border: 0; background: transparent; color: var(--muted);
+      padding: 0; font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .detail h2 { font-size: 28px; line-height: 1.25; margin: 12px 0 8px; }
+    .detail .ko { font-size: 16px; }
+
+    @media (max-width: 900px) {
+      .stage { grid-template-columns: 1fr; padding: 0; gap: 0; }
+      .pitch { display: none; }
+      .phone {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+      .screen { border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="pitch">
+      <p class="eyebrow">AI ENGLISH CAPTURE AGENT</p>
+      <h1 class="logo">Snap<span>lish</span></h1>
+      <p class="lead">캡처하는 순간이 곧 공부가 됩니다. 궁금했던 한 문장을 즉시 번역하고, AI가 당신의 관심사를 읽어 알아서 복습시켜 드려요.</p>
+      <ul class="points">
+        <li><button type="button" data-go="home" class="on"><span class="dot"></span><span class="point-label">캡처 즉시 번역 알림</span></button></li>
+        <li><button type="button" data-go="quiz"><span class="dot"></span><span class="point-label">AI 맞춤 복습 퀴즈</span></button></li>
+        <li><button type="button" data-go="vocab"><span class="dot"></span><span class="point-label">발음 · 단어장</span></button></li>
+        <li><button type="button" data-go="goal"><span class="dot"></span><span class="point-label">토익 목표 학습 경로</span></button></li>
+      </ul>
+      <p class="watch" id="watch">캡처 감지 연결 중</p>
+    </section>
+
+    <div class="phone">
+      <div class="screen" id="app">
+        <div class="status">
+          <span>9:41</span>
+          <span class="status-right">
+            <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="2" height="4" rx="0.4"/><rect x="3.5" y="5.5" width="2" height="6.5" rx="0.4"/><rect x="7" y="3" width="2" height="9" rx="0.4"/><rect x="10.5" y="0" width="2" height="12" rx="0.4"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-hidden="true"><path d="M8 3.2c1.7 0 3.2.6 4.4 1.7l1.1-1.2A8.2 8.2 0 0 0 8 1.4a8.2 8.2 0 0 0-5.5 2.3l1.1 1.2A6.4 6.4 0 0 1 8 3.2Zm0 3.1c.9 0 1.7.3 2.3.9l1.2-1.2A5 5 0 0 0 8 4.6a5 5 0 0 0-3.5 1.4l1.2 1.2c.6-.6 1.4-.9 2.3-.9ZM8 9.4a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Z"/></svg>
+            100%
+          </span>
+        </div>
+        <div class="scroll" id="scroll"></div>
+        <div class="toast" id="toast" hidden></div>
+        <nav class="tabbar">
+          <button class="tab on" type="button" data-go="home" aria-label="홈">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"/></svg>
+            홈
+          </button>
+          <button class="tab" type="button" data-go="vocab" aria-label="단어장">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4.5h11.5A1.5 1.5 0 0 1 19 6v13.5H7.5A1.5 1.5 0 0 0 6 21V4.5Z"/><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3H19"/></svg>
+            단어장
+          </button>
+          <div class="cam-wrap">
+            <button class="cam" type="button" data-go="capture" aria-label="캡처 번역">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 7.5 9.2 5.5h5.6L16 7.5h2.2A1.8 1.8 0 0 1 20 9.3v8.4a1.8 1.8 0 0 1-1.8 1.8H5.8A1.8 1.8 0 0 1 4 17.7V9.3a1.8 1.8 0 0 1 1.8-1.8H8Z"/><circle cx="12" cy="13" r="3.2"/></svg>
+            </button>
+          </div>
+          <button class="tab" type="button" data-go="quiz" aria-label="퀴즈">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+            퀴즈
+          </button>
+          <button class="tab" type="button" data-go="goal" aria-label="목표">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+            목표
+          </button>
+        </nav>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const alertItem = {
+      id: "break",
+      source: "YouTube · 공연 브이로그",
+      tag: "관용구",
+      en: "Break a leg tonight!",
+      ko: "오늘 밤 행운을 빌어!",
+      note: "공연 전 응원 표현"
+    };
+
+    const items = [
+      { id: "fence", source: "Netflix · Friends", tag: "관용구", en: "I'm on the fence about it.", ko: "그것에 대해 아직 결정을 못 했어.", note: "결정을 망설일 때 쓰는 말" },
+      { id: "base", source: "YouTube · Office Vlog", tag: "비즈니스", en: "Let's touch base next week.", ko: "다음 주에 다시 이야기하자.", note: "진행 상황을 짧게 맞출 때" },
+      { id: "calloff", source: "Web · BBC News", tag: "토익", en: "The meeting was called off.", ko: "회의가 취소되었다.", note: "call off = 취소하다" },
+      { id: "ball", source: "YouTube · Office Vlog", tag: "비즈니스", en: "Could you get the ball rolling?", ko: "먼저 시작을 끊어 줄래요?", note: "일을 시작하게 만들다" },
+      { id: "cake", source: "Netflix · Friends", tag: "관용구", en: "It's a piece of cake.", ko: "정말 쉬운 일이야.", note: "아주 쉽다는 뜻" },
+      { id: "behind", source: "Web · Company Mail", tag: "토익", en: "We're running behind schedule.", ko: "일정보다 늦어지고 있어.", note: "behind schedule = 일정 지연" }
+    ];
+
+    const detected = [
+      { ...alertItem, kind: "line" },
+      { id: "ui1", text: "구독 1.2만", kind: "ui" },
+      { id: "ui2", text: "좋아요 3.4천", kind: "ui" },
+      { id: "got", source: "YouTube · 공연 브이로그", tag: "일상", en: "You've got this.", ko: "너라면 할 수 있어.", note: "상대를 응원할 때", kind: "line" },
+      { id: "ui3", text: "댓글 128", kind: "ui" }
+    ];
+
+    const questions = [
+      { prompt: "“Break a leg tonight!”에 가까운 뜻은?", choices: ["오늘 밤 다리를 조심해", "오늘 밤 행운을 빌어", "오늘 밤은 쉬어", "오늘 밤 무대에 서지 마"], answer: 1, explain: "공연 전에 성공을 빌 때 쓰는 관용 표현이에요." },
+      { prompt: "“I'm on the fence about it.”은 어떤 말인가요?", choices: ["그 울타리를 고칠게", "그것에 대해 아직 결정을 못 했어", "그건 내 취향이야", "완전히 반대야"], answer: 1, explain: "Friends 자막에서 저장한 표현이에요. 망설일 때 씁니다." },
+      { prompt: "“Let's touch base next week.”의 의미는?", choices: ["다음 주에 베이스를 연주하자", "다음 주에 간단히 다시 이야기하자", "다음 주에 만나지 말자", "다음 주에 보고서를 끝내자"], answer: 1, explain: "직장 브이로그에서 자주 나온 비즈니스 표현이에요." },
+      { prompt: "“The meeting was called off.”에서 call off는?", choices: ["미루다", "취소하다", "시작하다", "연장하다"], answer: 1, explain: "토익에 자주 나오는 동사구예요. 뉴스 캡처에서 건진 표현입니다." },
+      { prompt: "“Could you get the ball rolling?”은?", choices: ["공을 굴려 줄래?", "먼저 시작을 끊어 줄래?", "속도를 줄여 줄래?", "결정을 미뤄 줄래?"], answer: 1, explain: "회의를 시작하자고 할 때 쓰는 말이에요." }
+    ];
+
+    const goals = {
+      700: { need: 60 },
+      800: { need: 78 },
+      900: { need: 110 }
+    };
+
+    const state = {
+      route: "home",
+      back: "home",
+      showAlert: true,
+      alertSaved: false,
+      savedCount: 76,
+      captureCount: 128,
+      streak: 12,
+      query: "",
+      filter: "전체",
+      focusSearch: false,
+      goal: 800,
+      capturePick: null,
+      detailId: null,
+      quiz: { i: 0, picked: null, score: 0, done: false }
+    };
+
+    const scroll = document.getElementById("scroll");
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    function icon(name) {
+      const paths = {
+        pin: '<path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><circle cx="12" cy="11" r="1.6" fill="currentColor" stroke="none"/>',
+        spark: '<path d="M12 3.5 13.4 9 19 10.5 13.4 12 12 17.5 10.6 12 5 10.5 10.6 9 12 3.5Z"/>',
+        close: '<path d="M7 7l10 10M17 7 7 17"/>',
+        play: '<rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none"/>'
+      };
+      return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">${paths[name]}</svg>`;
+    }
+
+    function activeAlert() {
+      return state.live || alertItem;
+    }
+
+    function findItem(id) {
+      if (state.live && id === state.live.id) return state.live;
+      if (id === alertItem.id) return alertItem;
+      return items.find((item) => item.id === id) || detected.find((item) => item.id === id);
+    }
+
+    function savedAlready(en) {
+      return items.some((item) => item.en === en) || (en === alertItem.en && state.alertSaved);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.hidden = false;
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => { toast.hidden = true; }, 1700);
+    }
+
+    function speak(text) {
+      if (!window.speechSynthesis) {
+        showToast("이 브라우저에서는 발음을 재생할 수 없어요");
+        return;
+      }
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = 0.92;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+
+    function go(route) {
+      state.route = route;
+      state.focusSearch = false;
+      if (route !== "capture") state.capturePick = null;
+      render();
+    }
+
+    function saveExpression(item) {
+      if (savedAlready(item.en)) {
+        showToast("이미 단어장에 있어요");
+        return;
+      }
+      items.unshift({ ...item, saved: true });
+      state.savedCount += 1;
+      if (item.live) item.saved = true;
+      if (item.en === alertItem.en) state.alertSaved = true;
+      if (item.live) {
+        fetch("/api/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ en: item.en, ko: item.ko, note: item.note || "" })
+        });
+      }
+      showToast("단어장에 저장했어요");
+      render();
+    }
+
+    function card(item) {
+      return `
+        <button class="card" type="button" data-action="open" data-id="${item.id}">
+          <span class="row-between">
+            <span class="source">${icon("play")}${esc(item.source)}</span>
+            <span class="tag">${esc(item.tag)}</span>
+          </span>
+          <p class="en">${esc(item.en)}</p>
+          <p class="ko">${esc(item.ko)}</p>
+        </button>`;
+    }
+
+    function viewHome() {
+      const current = activeAlert();
+      const saved = current.live ? !!current.saved : state.alertSaved;
+      const note = current.note ? ` <span class="note">(${esc(current.note)})</span>` : "";
+      const others = (current.lines || []).filter((line) => line !== current.en).slice(0, 3);
+      const otherButtons = others.map((line) => {
+        const index = current.lines.indexOf(line);
+        return `<button class="ghost" type="button" data-action="pick-live" data-index="${index}">${esc(line)}</button>`;
+      }).join("");
+      const alert = state.showAlert ? `
+        <article class="alert">
+          <div class="alert-top">
+            <p class="kicker">${icon("pin")} Snaplish · 방금 캡처</p>
+            <button class="icon-btn" type="button" data-action="dismiss" aria-label="알림 닫기">${icon("close")}</button>
+          </div>
+          <p class="phrase">“${esc(current.en)}”</p>
+          <p class="ko">${esc(current.ko)}${note}</p>
+          <div class="btn-row">
+            <button class="pill" type="button" data-action="save" data-id="${current.id}" ${saved ? "disabled" : ""}>${saved ? "저장됨" : "단어장 저장"}</button>
+            <button class="ghost" type="button" data-action="speak" data-id="${current.id}">발음</button>
+          </div>
+          ${otherButtons ? `<div class="choices">${otherButtons}</div>` : ""}
+        </article>` : "";
+
+      const recent = items.slice(0, 4).map(card).join("");
+      return `
+        <div class="stack">
+          ${alert}
+          <button class="insight" type="button" data-go="quiz">
+            <p class="kicker">${icon("spark")} AI 인사이트</p>
+            <p>최근 캡처의 42%가 일상 관용구예요. 드라마 속 표현을 중심으로 오늘 저녁 8시에 5문제 복습을 준비했어요.</p>
+          </button>
+          <div class="stats">
+            <div class="stat"><b>${state.captureCount}</b><span>캡처</span></div>
+            <div class="stat"><b>${state.savedCount}</b><span>저장 표현</span></div>
+            <div class="stat"><b>${state.streak}일</b><span>연속 학습</span></div>
+          </div>
+          <h2 class="section-title">최근 번역</h2>
+          ${recent}
+        </div>`;
+    }
+
+    function viewVocab() {
+      const filters = ["전체", "관용구", "비즈니스", "토익", "일상"];
+      const q = state.query.trim().toLowerCase();
+      const list = items.filter((item) => {
+        const tagOk = state.filter === "전체" || item.tag === state.filter;
+        const blob = `${item.en} ${item.ko} ${item.source} ${item.note}`.toLowerCase();
+        return tagOk && (!q || blob.includes(q));
+      });
+      const cards = list.length
+        ? list.map((item) => `
+          <article class="card" style="cursor:default">
+            <span class="row-between">
+              <span class="source">${icon("play")}${esc(item.source)}</span>
+              <span class="tag">${esc(item.tag)}</span>
+            </span>
+            <p class="en">${esc(item.en)}</p>
+            <p class="ko">${esc(item.ko)}</p>
+            <p class="sub" style="margin-top:6px">${esc(item.note)}</p>
+            <button class="speak" type="button" data-action="speak" data-id="${item.id}">발음 듣기</button>
+          </article>`).join("")
+        : `<p class="empty">이 조건에 맞는 표현이 없어요.</p>`;
+
+      return `
+        <h2 class="page-title">단어장</h2>
+        <p class="sub">따로 정리하지 않아도 표현 ${state.savedCount}개가 쌓여 있어요.</p>
+        <input class="search" id="q" value="${esc(state.query)}" placeholder="표현, 출처, 뜻 검색" autocomplete="off" />
+        <div class="chips">
+          ${filters.map((name) => `<button class="chip ${state.filter === name ? "on" : ""}" type="button" data-action="filter" data-filter="${name}">${name}</button>`).join("")}
+        </div>
+        <div class="stack">${cards}</div>`;
+    }
+
+    function viewCapture() {
+      const picked = detected.find((item) => item.id === state.capturePick && item.kind === "line");
+      const lines = detected.map((item) => {
+        if (item.kind === "ui") {
+          return `<button class="line ui" type="button" data-action="ignore"><span>${esc(item.text)}</span><small>화면 글자</small></button>`;
+        }
+        const on = state.capturePick === item.id ? "picked" : "";
+        return `<button class="line ${on}" type="button" data-action="pick" data-id="${item.id}"><span>${esc(item.en)}</span><small>자막</small></button>`;
+      }).join("");
+
+      const result = picked ? `
+        <article class="alert">
+          <p class="kicker">${icon("pin")} 선택한 문장</p>
+          <p class="phrase">“${esc(picked.en)}”</p>
+          <p class="ko">${esc(picked.ko)} <span class="note">(${esc(picked.note)})</span></p>
+          <div class="btn-row">
+            <button class="pill" type="button" data-action="save" data-id="${picked.id}" ${savedAlready(picked.en) ? "disabled" : ""}>${savedAlready(picked.en) ? "저장됨" : "단어장 저장"}</button>
+            <button class="ghost" type="button" data-action="speak" data-id="${picked.id}">발음</button>
+          </div>
+        </article>` : "";
+
+      return `
+        <h2 class="page-title">문장 선택</h2>
+        <p class="sub">자막과 버튼 글자가 섞여 있어요. 알고 싶은 문장을 탭하세요.</p>
+        <div class="stack" style="margin-top:14px">
+          <article class="shot">
+            <div class="shot-video"><span>“Break a leg tonight!”</span></div>
+            <div class="shot-meta">YouTube · 공연 브이로그 · 방금 찍은 스크린샷</div>
+          </article>
+          ${result || `<div class="stack">${lines}</div>`}
+          ${result ? `<button class="wide" type="button" data-action="reset-capture" style="background:#fff;color:#0b140d;border:1px solid var(--line)">다른 문장 고르기</button>` : ""}
+        </div>`;
+    }
+
+    function viewQuiz() {
+      if (state.quiz.done) {
+        return `
+          <div class="stack">
+            <section class="score">
+              <p class="kicker">오늘 복습</p>
+              <b>${state.quiz.score} / ${questions.length}</b>
+              <p>드라마와 영상에서 건진 표현으로 풀었어요. 틀린 문제는 저녁 8시 알림에 다시 넣을게요.</p>
+            </section>
+            <button class="wide" type="button" data-action="retry">다시 풀기</button>
+          </div>`;
+      }
+      const q = questions[state.quiz.i];
+      const picked = state.quiz.picked;
+      const choices = q.choices.map((text, index) => {
+        let cls = "choice";
+        if (picked !== null && index === q.answer) cls += " good";
+        else if (picked !== null && index === picked) cls += " bad";
+        return `<button class="${cls}" type="button" data-action="answer" data-index="${index}" ${picked !== null ? "disabled" : ""}>${esc(text)}</button>`;
+      }).join("");
+      const width = Math.round(((state.quiz.i + (picked !== null ? 1 : 0)) / questions.length) * 100);
+      return `
+        <div class="q-top">
+          <div>
+            <p class="sub" style="margin:0">오늘의 복습</p>
+            <h2>드라마 속 관용구</h2>
+          </div>
+          <span class="tag">${state.quiz.i + 1} / ${questions.length}</span>
+        </div>
+        <div class="bar" aria-hidden="true"><i style="width:${width}%"></i></div>
+        <p class="prompt">${esc(q.prompt)}</p>
+        <div class="stack">${choices}</div>
+        ${picked !== null ? `<p class="explain">${esc(q.explain)}</p><button class="wide" type="button" data-action="next">${state.quiz.i === questions.length - 1 ? "결과 보기" : "다음"}</button>` : ""}`;
+    }
+
+    function viewGoal() {
+      const meta = goals[state.goal];
+      const ratio = Math.min(100, Math.round((48 / meta.need) * 100));
+      const chips = [700, 800, 900].map((score) => `<button class="goal-chip ${state.goal === score ? "on" : ""}" type="button" data-action="goal" data-score="${score}">${score}</button>`).join("");
+      return `
+        <h2 class="page-title">학습 목표</h2>
+        <p class="sub">보던 콘텐츠의 빈출 표현이 시험 공부가 됩니다.</p>
+        <section class="goal-hero" style="margin-top:14px">
+          <p class="kicker">목표 점수</p>
+          <h2>토익 ${state.goal}</h2>
+          <p>이미 만난 빈출 어휘 48개를 이 목표와 겹쳐 복습해요.</p>
+          <div class="bar"><i style="width:${ratio}%"></i></div>
+          <p class="fine">빈출 어휘 48 / ${meta.need}</p>
+        </section>
+        <div class="chips">${chips}</div>
+        <div class="stack">
+          <article class="step"><span class="num">1</span><div><b>캡처로 표현 모으기</b><span>${state.captureCount}개 · 유튜브와 웹 중심</span></div></article>
+          <article class="step"><span class="num">2</span><div><b>단어장에 남기기</b><span>${state.savedCount}개 저장 · 발음까지 바로 확인</span></div></article>
+          <article class="step"><span class="num">3</span><div><b>간격 반복으로 복습</b><span>오늘 저녁 8시 · 5문제</span></div></article>
+          <article class="step"><span class="num">4</span><div><b>토익 빈출과 겹치는 표현</b><span>48개 · 관심 콘텐츠 안에서 반복</span></div></article>
+        </div>`;
+    }
+
+    function viewDetail() {
+      const item = findItem(state.detailId);
+      if (!item) return viewHome();
+      const saved = savedAlready(item.en);
+      return `
+        <button class="back" type="button" data-action="back">뒤로</button>
+        <article class="detail">
+          <p class="source" style="margin-top:14px">${icon("play")}${esc(item.source)}</p>
+          <h2>${esc(item.en)}</h2>
+          <p class="ko">${esc(item.ko)}</p>
+          <p class="sub">${esc(item.note)}</p>
+          <div class="btn-row" style="margin-top:16px">
+            <button class="pill" type="button" data-action="save" data-id="${item.id}" ${saved ? "disabled" : ""} style="${saved ? "" : "color:#0b140d"}">${saved ? "저장됨" : "단어장 저장"}</button>
+            <button class="speak" type="button" data-action="speak" data-id="${item.id}" style="margin-top:0">발음 듣기</button>
+          </div>
+        </article>`;
+    }
+
+    function view() {
+      if (state.route === "vocab") return viewVocab();
+      if (state.route === "capture") return viewCapture();
+      if (state.route === "quiz") return viewQuiz();
+      if (state.route === "goal") return viewGoal();
+      if (state.route === "detail") return viewDetail();
+      return viewHome();
+    }
+
+    function render() {
+      scroll.innerHTML = view();
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.classList.toggle("on", tab.dataset.go === state.route);
+      });
+      document.querySelectorAll(".points button").forEach((button) => {
+        button.classList.toggle("on", button.dataset.go === state.route || (state.route === "detail" && button.dataset.go === state.back));
+      });
+      if (state.focusSearch) {
+        const input = document.getElementById("q");
+        if (input) {
+          input.focus();
+          const end = input.value.length;
+          input.setSelectionRange(end, end);
+        }
+      }
+    }
+
+    document.body.addEventListener("click", (event) => {
+      const target = event.target.closest("[data-go], [data-action]");
+      if (!target) return;
+      if (target.dataset.go) {
+        if (target.dataset.go !== "vocab") state.query = "";
+        go(target.dataset.go);
+        return;
+      }
+      const action = target.dataset.action;
+      const item = target.dataset.id ? findItem(target.dataset.id) : null;
+
+      if (action === "dismiss") state.showAlert = false;
+      if (action === "pick-live" && state.live) {
+        const line = state.live.lines[Number(target.dataset.index)];
+        showToast("이 문장으로 다시 번역해요");
+        fetch("/api/pick", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: line })
+        });
+        return;
+      }
+      if (action === "speak" && item) speak(item.en);
+      if (action === "save" && item) {
+        saveExpression(item);
+        return;
+      }
+      if (action === "filter") state.filter = target.dataset.filter;
+      if (action === "ignore") {
+        showToast("버튼·숫자 글자는 번역에서 빼 두었어요");
+        return;
+      }
+      if (action === "pick") state.capturePick = target.dataset.id;
+      if (action === "reset-capture") state.capturePick = null;
+      if (action === "open") {
+        state.back = state.route;
+        state.detailId = target.dataset.id;
+        state.route = "detail";
+      }
+      if (action === "back") state.route = state.back || "home";
+      if (action === "answer" && state.quiz.picked === null) {
+        const index = Number(target.dataset.index);
+        state.quiz.picked = index;
+        if (index === questions[state.quiz.i].answer) state.quiz.score += 1;
+      }
+      if (action === "next") {
+        if (state.quiz.i === questions.length - 1) state.quiz.done = true;
+        else {
+          state.quiz.i += 1;
+          state.quiz.picked = null;
+        }
+      }
+      if (action === "retry") state.quiz = { i: 0, picked: null, score: 0, done: false };
+      if (action === "goal") state.goal = Number(target.dataset.score);
+      render();
+    });
+
+    scroll.addEventListener("input", (event) => {
+      if (event.target.id !== "q") return;
+      state.query = event.target.value;
+      state.focusSearch = true;
+      render();
+    });
+
+    function mergeSaved(list) {
+      let added = 0;
+      list.forEach((item) => {
+        if (!item.en || items.some((saved) => saved.en === item.en)) return;
+        items.unshift({
+          id: "saved-" + item.en,
+          source: item.source || "내 노트북",
+          tag: item.tag || "캡처",
+          en: item.en,
+          ko: item.ko,
+          note: item.note || "",
+          live: true,
+          saved: true
+        });
+        added += 1;
+      });
+      if (added) state.savedCount += added;
+      return added;
+    }
+
+    async function poll() {
+      const watch = document.getElementById("watch");
+      try {
+        const response = await fetch("/api/latest", { cache: "no-store" });
+        const data = await response.json();
+        if (watch) {
+          if (data.paused) {
+            const minutes = Math.max(1, Math.ceil((data.pausedFor || 0) / 60));
+            watch.textContent = `번역 알림을 ${minutes}분간 꺼 두었어요. 작은 카드에서 다시 켤 수 있어요.`;
+          } else {
+            watch.textContent = "이 노트북에서 캡처를 감지하고 있어요. Win + Shift + S";
+          }
+        }
+        const added = mergeSaved(data.saved || []);
+        if (data.capture) {
+          const sig = [data.capture.id, data.capture.en, data.capture.ko, data.capture.saved].join("|");
+          if (sig !== state.liveSig) {
+            const isNew = !state.live || state.live.id !== data.capture.id;
+            state.liveSig = sig;
+            state.live = data.capture;
+            if (isNew) {
+              state.showAlert = true;
+              state.captureCount += 1;
+            }
+            if (state.route === "home" || state.route === "vocab" || added) render();
+            return;
+          }
+        }
+        if (added && (state.route === "home" || state.route === "vocab")) render();
+      } catch (error) {
+        if (watch) watch.textContent = "캡처 감지 서버에 연결되지 않았어요";
+      }
+    }
+
+    render();
+    poll();
+    setInterval(poll, 1000);
+  </script>
+</body>
+</html>
